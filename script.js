@@ -90,7 +90,6 @@ $(document).ready(function() {
 });
 
 $(window).resize(function() {
-	console.log("Document resized")
 	h = $(document).height()
 	w = $(document).width()
 	dim = 0.99 * Math.min(h, w)
