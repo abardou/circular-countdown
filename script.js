@@ -86,7 +86,7 @@ $(document).ready(function() {
 			$('h2').html(secondsToTimeString(left, units, values, whole_delay));
 			
 			document.getElementById("arc1").setAttribute("d", describeArc(c, c, radius, 0, ratio * 360));
-	}, 300);
+	}, 250);
 });
 
 $(window).resize(function() {
