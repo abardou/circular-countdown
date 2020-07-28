@@ -45,7 +45,7 @@ var radius = null;
 $(document).ready(function() {
 	var h = $(document).height()
 	var w = $(document).width()
-	var dim = 0.95 * Math.min(h, w)
+	var dim = 0.98 * Math.min(h, w)
 	$('.item').css({'width':dim+'px', 'height':dim+'px'});
 	var stroke_width = dim * 0.045;
 	c = dim / 2
