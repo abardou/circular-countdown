@@ -1,4 +1,3 @@
-
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
   var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
 
@@ -23,9 +22,35 @@ function describeArc(x, y, radius, startAngle, endAngle){
 	return d;       
 }
 
-function secondsToTimeString(seconds, units, values, total) {
+function secondsToTimeString(now, end, ratio) {
 	str = ""
-	elapsed = Math.round(10000*(1 - seconds/total)) / 100;
+	let end_copy = new Date(end.getTime());
+	let elapsed = Math.round(10000*ratio) / 100;
+
+	// Year and month depends on number of days
+	// Year
+	nyears = 0
+	end_copy = new Date(end_copy.setFullYear(end_copy.getFullYear()-1));
+	while(end_copy > now) {
+		nyears += 1;
+		end_copy = new Date(end_copy.setFullYear(end_copy.getFullYear()-1));
+	}
+	end_copy = new Date(end_copy.setFullYear(end_copy.getFullYear()+1))
+	if (nyears > 0)
+		str += "<b style=\"font-size: 1.6em\">" + nyears + "</b>Year" + (nyears > 1 ? "s" : "") + " ";
+	
+	// Month
+	nmonth = 0
+	end_copy = new Date(end_copy.setMonth(end_copy.getMonth()-1));
+	while(end_copy > now) {
+		nmonth += 1;
+		end_copy = new Date(end_copy.setMonth(end_copy.getMonth()-1));
+	}
+	end_copy = new Date(end_copy.setMonth(end_copy.getMonth()+1))
+	if (nmonth > 0)
+		str += "<b style=\"font-size: 1.6em\">" + nmonth + "</b>Month" + (nmonth > 1 ? "s" : "") + " ";
+
+	seconds = (end_copy - now) / 1000
 	for (i=0; i < units.length; i++) {
 		if (seconds > values[i]) {
 			n = Math.floor(seconds / values[i]);
@@ -72,7 +97,7 @@ $(document).ready(function() {
 	var font_size = dim > ss_crit ? diam * nss_fs : diam * ss_fs;
 	$('.item').append("<h2 style=\"width: "+(0.85*diam)+"px; font-size: "+ font_size +"px\"></h2><svg width=\""+dim+"px\" height=\""+dim+"px\"><path id=\"arc1\" fill=\"none\" stroke=\"#fa691d\" stroke-width=\""+stroke_width+"\"/></svg>")
 
-	let start = new Date(getUrlParameter('s')); // &s=2020-07-24T08%3A20%3A00&e=2020-08-16T11%3A05%3A00
+	let start = new Date(getUrlParameter('s'));
 	let end = new Date(getUrlParameter('e'));
 	let whole_delay = (end - start) / 1000;
 	units = ['Week', 'Day', 'Hour', 'Minute', 'Second'];
@@ -80,10 +105,9 @@ $(document).ready(function() {
 	var interval = setInterval(function() {
 			let now = Date.now()
 			let elapsed = (now - start) / 1000
-			let left = whole_delay - elapsed
 			let ratio = elapsed / whole_delay
 			
-			$('h2').html(secondsToTimeString(left, units, values, whole_delay));
+			$('h2').html(secondsToTimeString(now, end, ratio));
 			
 			document.getElementById("arc1").setAttribute("d", describeArc(c, c, radius, 0, ratio * 360));
 	}, 250);
