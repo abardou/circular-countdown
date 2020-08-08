@@ -119,8 +119,8 @@ var getUrlParameter = function getUrlParameter(sParam) {
 var c = null;
 var radius = null;
 var ss_crit = 600;
-var ss_fs = 0.065
-var nss_fs = 0.047
+var ss_fs = 0.15
+var nss_fs = 0.11
 var sw_whole = 0.05
 var sw_part = 0.006
 var space_circle = 0.003
@@ -131,6 +131,7 @@ var part_sw = null;
 var space = null;
 var diam = null;
 var font_size = null;
+var smallest_radius = null;
 
 $(document).ready(function() {
 	var h = $(document).height()
@@ -142,9 +143,10 @@ $(document).ready(function() {
 	space = space_circle * dim;
 	c = dim / 2
 	radius = c - stroke_width * 0.8;
+	smallest_radius = radius-stroke_width/2-6*space-11*part_sw/2
 	diam = radius * 2;
-	font_size = dim > ss_crit ? diam * nss_fs : diam * ss_fs;
-	$('.item').append("<h2 style=\"width: "+(0.8*diam)+"px; font-size: "+ font_size +"px\"></h2><svg width=\""+dim+"px\" height=\""+dim+"px\"><path id=\"whole\" fill=\"none\" stroke=\"#fa691d\" stroke-width=\""+stroke_width+"\"/><path id=\"year\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"month\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"week\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"day\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"hour\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"minute\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/></svg>")
+	font_size = dim > ss_crit ? smallest_radius * nss_fs : smallest_radius * ss_fs;
+	$('.item').append("<h2 style=\"width: "+(2*0.95*smallest_radius)+"px; font-size: "+ font_size +"px\"></h2><svg width=\""+dim+"px\" height=\""+dim+"px\"><path id=\"whole\" fill=\"none\" stroke=\"#fa691d\" stroke-width=\""+stroke_width+"\"/><path id=\"year\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"month\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"week\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"day\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"hour\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/><path id=\"minute\" fill=\"none\" stroke=\"#e0e0e0\" stroke-width=\""+part_sw+"\"/></svg>")
 
 	let start = new Date(getUrlParameter('s'));
 	let end = new Date(getUrlParameter('e'));
@@ -171,13 +173,14 @@ $(window).resize(function() {
 	stroke_width = sw_whole * dim;
 	part_sw = sw_part * dim;
 	space = space_circle * dim;
-	console.log("UPDATEEED")
-	console.log(space+","+stroke_width)
+	console.log(smallest_radius)
+	console.log(smallest_radius * nss_fs)
 	c = dim / 2
 	radius = c - stroke_width * 0.8;
+	smallest_radius = radius-stroke_width/2-6*space-11*part_sw/2
 	diam = radius * 2;
-	font_size = dim > ss_crit ? diam * nss_fs : diam * ss_fs
-	$('h2').css({'width': 0.8*diam+'px', 'font-size': font_size+'px'});
+	font_size = dim > ss_crit ? smallest_radius * nss_fs : smallest_radius * ss_fs
+	$('h2').css({'width': 2*0.95*smallest_radius+'px', 'font-size': font_size+'px'});
 	$('svg').css({'width': dim+'px', 'height': dim+'px'})
 	document.getElementById("whole").setAttribute("stroke-width", stroke_width);
 	document.getElementById("year").setAttribute("stroke-width", part_sw);
