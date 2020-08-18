@@ -8,7 +8,6 @@ function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
 }
 
 function describeArc(x, y, radius, startAngle, endAngle){
-
 	var start = polarToCartesian(x, y, radius, endAngle);
 	var end = polarToCartesian(x, y, radius, startAngle);
 
@@ -25,7 +24,6 @@ function describeArc(x, y, radius, startAngle, endAngle){
 function secondsToTimeString(now, end, ratio) {
 	str = ""
 	let end_copy = new Date(end.getTime());
-	let elapsed = Math.round(10000*ratio) / 100;
 
 	// Year and month depends on number of days
 	// Year
@@ -39,7 +37,7 @@ function secondsToTimeString(now, end, ratio) {
 	if (nyears > 0)
 		str += "<b style=\"font-size: 1.6em\">" + nyears + "</b>Year" + (nyears > 1 ? "s" : "") + " ";
 	
-	// Month
+	// Month= 1
 	nmonth = 0
 	end_copy = new Date(end_copy.setMonth(end_copy.getMonth()-1));
 	while(end_copy > now) {
@@ -61,7 +59,10 @@ function secondsToTimeString(now, end, ratio) {
 		}
 	}
 
-	str += "</br></br><b style=\"font-size: 1.6em\">"+elapsed+"%</b> elapsed"
+	if (ratio != null) {
+		let elapsed = Math.round(10000*ratio) / 100;
+		str += "</br></br><b style=\"font-size: 1.6em\">"+elapsed+"%</b> elapsed"
+	}
 
 	return str
 }
@@ -134,6 +135,11 @@ var font_size = null;
 var smallest_radius = null;
 
 $(document).ready(function() {
+	// Set title
+	t = getUrlParameter('t')
+	if (t != undefined)
+		document.title = t
+
 	var h = $(document).height()
 	var w = $(document).width()
 	dim = 0.99 * Math.min(h, w)
@@ -152,16 +158,21 @@ $(document).ready(function() {
 	let end = new Date(getUrlParameter('e'));
 	let whole_delay = (end - start) / 1000;
 	var interval = setInterval(function() {
-			let now = Date.now()
+			let now = new Date(Date.now())
 			let elapsed = (now - start) / 1000
-			let ratio = elapsed / whole_delay
-
-			console.log(space+","+stroke_width)
-			
-			$('h2').html(secondsToTimeString(now, end, ratio));
+			let over = elapsed >= whole_delay
+			let ratio = null
+			let pre_h2 = t != undefined ? "<b style=\"font-size: 1.8em\">" + t + '</b></br></br>' : ''
+			if (over) {
+				ratio = 0.9999999
+				$('h2').html(pre_h2 + "Completed since</br></br>" + secondsToTimeString(end, now, null));
+			} else {
+				ratio = elapsed / whole_delay
+				$('h2').html(pre_h2 + secondsToTimeString(now, end, ratio));
+				showPartCircles(start, now, end, c, radius, stroke_width, part_sw, space)
+			}
 			
 			document.getElementById("whole").setAttribute("d", describeArc(c, c, radius, 0, ratio * 360));
-			showPartCircles(start, now, end, c, radius, stroke_width, part_sw, space)
 	}, 55);
 });
 
@@ -173,8 +184,6 @@ $(window).resize(function() {
 	stroke_width = sw_whole * dim;
 	part_sw = sw_part * dim;
 	space = space_circle * dim;
-	console.log(smallest_radius)
-	console.log(smallest_radius * nss_fs)
 	c = dim / 2
 	radius = c - stroke_width * 0.8;
 	smallest_radius = radius-stroke_width/2-6*space-11*part_sw/2
