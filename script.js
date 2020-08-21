@@ -125,6 +125,7 @@ var nss_fs = 0.11
 var sw_whole = 0.05
 var sw_part = 0.006
 var space_circle = 0.003
+var arrived = new Date(Date.now())
 
 var dim = null;
 var stroke_width = null;
@@ -160,12 +161,15 @@ $(document).ready(function() {
 	var interval = setInterval(function() {
 			let now = new Date(Date.now())
 			let elapsed = (now - start) / 1000
-			let over = elapsed >= whole_delay
 			let ratio = null
 			let pre_h2 = t != undefined ? "<b style=\"font-size: 1.8em\">" + t + '</b></br></br>' : ''
-			if (over) {
+			if (elapsed >= whole_delay) {
 				ratio = 0.9999999
 				$('h2').html(pre_h2 + "Completed since</br></br>" + secondsToTimeString(end, now, null));
+			} else if (elapsed < 0) {
+				ratio = (now - arrived) / (start - arrived)
+				$('h2').html(pre_h2 + "Starting in</br></br>" + secondsToTimeString(now, start, null));
+				showPartCircles(arrived, now, start, c, radius, stroke_width, part_sw, space)
 			} else {
 				ratio = elapsed / whole_delay
 				$('h2').html(pre_h2 + secondsToTimeString(now, end, ratio));
